@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>Курс валют</title>
+    <style>
+      body {
+        background-color: gray;
+        font-family: 'Inter', sans-serif;
+      }
+
+      #currency-widget,
+      #currency-widget * {
+        font-family: 'Inter', sans-serif;
+      }
+
+      #currency-widget {
+        background-color: white;
+        position: relative;
+        /* border: 1px solid #ccc; */
+        border-radius: 5px;
+        padding: 24px 0;
+        width: 328px;
+        height: 260px;
+        text-align: center;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      #currency-widget input[type='number'] {
+        border: none;
+        outline: none;
+        background-color: transparent; /* Добавляем прозрачный фон */
+        width: 100%;
+      }
+
+      #base-currency-frame {
+        /* width: 100%; */
+        /* border: 1px solid black; */
+        border-radius: 16px;
+        /* padding: 6px; */
+        background-color: white;
+      }
+
+      #base-currency {
+        font-weight: 400;
+        font-size: 14px;
+        color: #031022;
+      }
+
+      #base-amount {
+        font-weight: 600;
+        font-size: 18px;
+        color: #18191c;
+      }
+
+      #base-amount::placeholder {
+        font-weight: 400;
+        font-size: 14px;
+        color: #18191c;
+      }
+
+      #target-currency-frame {
+        /* width: 100%; */
+        /* border: 1px solid black; */
+        border-radius: 16px;
+        background-color: white;
+      }
+
+      #target-currency {
+        font-weight: 400;
+        font-size: 14px;
+        color: #031022;
+      }
+
+      #target-amount {
+        font-weight: 600;
+        font-size: 18px;
+        color: #18191c;
+      }
+
+      #target-amount::placeholder {
+        font-weight: 400;
+        font-size: 14px;
+        color: #18191c;
+      }
+
+      #currency-widget select {
+        border: none;
+        outline: none;
+        height: 36px;
+        background-color: transparent;
+        padding: 6px;
+      }
+
+      #currency-frame {
+        margin: 0 16px;
+        text-align: center;
+        border-radius: 15px;
+        background-color: #f6f7fa;
+      }
+
+      #input-frame-container-1 {
+        padding: 6px 6px 6px 16px;
+        border-radius: 20px;
+        border: 1px solid #408ef6;
+        background-color: #e2ebff;
+        height: 98px;
+        display: flex;
+        align-items: center;
+      }
+
+      #input-frame-container-2 {
+        padding: 6px 6px 6px 16px;
+        border-radius: 20px;
+        /* border: 1px solid #408ef6; */
+        height: 98px;
+        background-color: #f6f7fa;
+        display: flex;
+        align-items: center;
+      }
+
+      #result-div {
+        margin: 0 16px;
+        display: flex;
+        align-items: start;
+        align-items: center;
+        display: none;
+      }
+
+      #result-div span {
+        font-weight: 400;
+        font-size: 12px;
+      }
+
+      #result {
+        font-weight: 400;
+        font-size: 14px;
+        padding: 2px 8px;
+        border-radius: 12px;
+        background-color: #f6f7fa;
+      }
+
+      #circle {
+        position: absolute; /* Абсолютное позиционирование */
+        width: 20px;
+        height: 20px;
+        background-color: #f3f3f3; /* Цвет кружочка */
+        border-radius: 60px; /* Делаем его круглым */
+        border: 2px solid white;
+        top: 44%; /* Положение сверху */
+        left: 50%; /* Положение слева */
+        transform: translate(-50%, -50%); /* Центрируем кружочек */
+      }
+
+      /* Стили для иконки */
+      .icon-div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        color: black; /* Цвет иконки */
+        font-size: 16px; /* Размер иконки */
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .popup-container {
+        border-radius: 16px;
+        position: absolute;
+        background-color: #fff;
+        width: 328px; /* Adjust as necessary */
+        max-height: 800px;
+        top: 0;
+        overflow-y: auto;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1000; /* Make sure it's above other content */
+      }
+
+      #currency-list div {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+      }
+
+      #currency-list div:hover {
+        background-color: #f6f7fa;
+      }
+
+      #base-list {
+        padding-top: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .icon {
+        width: 24px;
+        height: 24px;
+      }
+
+      /* Styles for the search box */
+      .search-box {
+        border-radius: 16px 16px 0 0;
+
+        width: calc(100% - 48px);
+        padding: 24px 24px 12px 24px;
+        border: none;
+        outline: none;
+        border-bottom: 1px solid #ccc;
+      }
+
+      .type-block {
+        padding: 0 24px;
+        text-align: left;
+        font-size: 16px;
+        font-weight: 600;
+        color: #18191c;
+      }
+
+      .type-block ul {
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        gap: 16px;
+      }
+
+      .method-block {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .main-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: #18191c;
+      }
+
+      .submain-text {
+        font-size: 14px;
+        font-weight: 400;
+        color: #939bae;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="currency-widget">
+      <div id="circle">
+        <!-- <img src="https://imgur.com/wTksC1X" /> -->
+      </div>
+      <!-- Кружочек -->
+
+      <div id="currency-frame">
+        <div id="input-frame-container-1">
+          <input
+            type="number"
+            id="base-amount"
+            value=""
+            placeholder="Введите сумму"
+          />
+
+          <div id="base-currency-frame">
+            <div id="base-trigger">
+              <select id="base-currency"></select>
+            </div>
+          </div>
+        </div>
+
+        <div id="input-frame-container-2">
+          <input
+            type="number"
+            id="target-amount"
+            value=""
+            placeholder="Введите сумму"
+          />
+
+          <div id="target-currency-frame">
+            <select id="target-currency">
+              <!-- <option value="RUB">RUB</option>
+            <option value="GBP">GBP</option> -->
+              <!-- Другие валюты можно добавить по мере необходимости -->
+            </select>
+          </div>
+        </div>
+      </div>
+      <div id="result-div">
+        <span>Обмен по курсу</span>
+        <div id="result"></div>
+      </div>
+      <div id="base-popup" class="popup-container hidden">
+        <input
+          type="text"
+          id="base-search"
+          class="search-box"
+          placeholder="Поиск..."
+        />
+        <div id="base-list" class="currency-list"></div>
+      </div>
+
+      <!-- Target Popup Container -->
+      <div id="target-popup" class="popup-container hidden">
+        <input
+          type="text"
+          id="target-search"
+          class="search-box"
+          placeholder="Поиск..."
+        />
+        <div id="target-list" class="currency-list"></div>
+      </div>
+    </div>
+
+    <script>
+      // Fetch currency data
+      function fetchCurrencyData() {
+        fetch('https://api.moneyport.world/exchange/methods?type=widget')
+          .then((response) => response.json())
+          .then((data) => {
+            // Save the data for later use
+            window.currencyData = data;
+          })
+          .catch((error) => {
+            console.error('Error fetching currency data:', error);
+          });
+      }
+
+      // Event listeners for the trigger buttons
+      document.addEventListener('DOMContentLoaded', function () {
+        // Fetch currency data
+        fetchCurrencyData();
+
+        var baseTrigger = document.getElementById('base-trigger');
+        var targetTrigger = document.getElementById('target-trigger');
+
+        if (baseTrigger) {
+          baseTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            populateList('base', window.currencyData.FROM); // Assume 'FROM' data is for the base
+            togglePopup('base-popup');
+          });
+        }
+
+        if (targetTrigger) {
+          targetTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            populateList('target', window.currencyData.TO); // Assume 'TO' data is for the target
+            togglePopup('target-popup');
+          });
+        }
+
+        // Rest of the script here...
+
+        // Event listener to close the popup when clicking outside
+        document.addEventListener('click', (e) => {
+          if (
+            !e.target.closest('.popup-container') &&
+            !e.target.closest('.search-box') &&
+            !e.target.closest('button')
+          ) {
+            document.querySelectorAll('.popup-container').forEach((popup) => {
+              popup.classList.add('hidden');
+            });
+          }
+        });
+      });
+
+      // Toggle popup visibility
+      function togglePopup(popupId) {
+        const popup = document.getElementById(popupId);
+        popup.classList.toggle('hidden');
+        // Rest of the function...
+      }
+
+      // Populate the list inside the popup
+      function populateList(type, data) {
+        const listId = type === 'base' ? 'base-list' : 'target-list';
+        const listContainer = document.getElementById(listId);
+        listContainer.innerHTML = ''; // Clear the list first
+        Object.keys(data).forEach((type) => {
+          const typeBlock = document.createElement('div');
+          typeBlock.classList.add('type-block');
+          typeBlock.textContent = type; // Display the type name
+
+          const currencyList = document.createElement('ul');
+          Object.keys(data[type]).forEach((currency) => {
+            data[type][currency].forEach((method) => {
+              const methodItem = document.createElement('div');
+              methodItem.classList.add('method-block');
+
+              const symbolItem = document.createElement('span');
+              symbolItem.classList.add('main-text');
+
+              const nameItem = document.createElement('span');
+              nameItem.classList.add('submain-text');
+
+              const imageBlock = document.createElement('div');
+              imageBlock.classList.add('icon-div');
+
+              const imageItem = document.createElement('img');
+              imageItem.classList.add('icon-img');
+
+              imageBlock.appendChild(imageItem);
+
+              methodItem.appendChild(imageBlock);
+              methodItem.appendChild(symbolItem);
+              methodItem.appendChild(nameItem);
+
+              imageItem.src = method.logo;
+              symbolItem.textContent = method.name;
+              nameItem.textContent = method.symbol;
+
+              methodItem.addEventListener('click', () => {
+                // Handle method selection here
+              });
+              currencyList.appendChild(methodItem);
+            });
+          });
+          typeBlock.appendChild(currencyList);
+          listContainer.appendChild(typeBlock);
+        });
+      }
+
+      // Close the popup when clicking outside
+      document.addEventListener('click', (e) => {
+        if (
+          !e.target.matches('.popup-container') &&
+          !e.target.matches('.search-box') &&
+          !e.target.matches('.currency-block') &&
+          !e.target.matches('button')
+        ) {
+          console.log('hide');
+          document.querySelectorAll('.popup-container').forEach((popup) => {
+            popup.classList.add('hidden');
+          });
+        }
+      });
+
+      // Initial fetch of currency data
+      fetchCurrencyData();
+
+      // document
+      //   .getElementById('base-amount')
+      //   .addEventListener('input', calculateExchangeRate);
+      // document
+      //   .getElementById('target-amount')
+      //   .addEventListener('input', calculateExchangeRate);
+      // document
+      //   .getElementById('base-currency')
+      //   .addEventListener('change', calculateExchangeRate);
+      // document
+      //   .getElementById('target-currency')
+      //   .addEventListener('change', calculateExchangeRate);
+
+      document
+        .getElementById('input-frame-container-1')
+        .addEventListener('mousedown', function (event) {
+          if (!event.target.matches('select')) {
+            document.getElementById('base-amount').focus();
+          }
+        });
+
+      document
+        .getElementById('input-frame-container-2')
+        .addEventListener('mousedown', function (event) {
+          if (!event.target.matches('select')) {
+            document.getElementById('target-amount').focus();
+          }
+        });
+      var preventRecalculation = false;
+    </script>
+  </body>
+</html>
